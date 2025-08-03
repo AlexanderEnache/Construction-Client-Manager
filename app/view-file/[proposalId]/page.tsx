@@ -45,8 +45,10 @@ export default async function Page({ params }: Props) {
       <FilePreview proposalId={params.proposalId} fileUrl={proposal.file_url}
       
       
-        signerName={"proposal.client_id_fkey[0].name"} 
+        signerName={"name"} 
         signerEmail={"alex.d.enache@gmail.com"}
+
+        proposalTitle={proposal.title}
 
       />
     </div>

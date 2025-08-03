@@ -8,6 +8,7 @@ interface FileViewerWrapperProps {
   fileUrl: string | null;
   signerName: string;
   signerEmail: string;
+  proposalTitle: string;
 }
 
 export default function FilePreview({
@@ -15,6 +16,7 @@ export default function FilePreview({
   fileUrl,
   signerName,
   signerEmail,
+  proposalTitle,
 }: FileViewerWrapperProps) {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -27,14 +29,16 @@ export default function FilePreview({
       const res = await fetch("/api/docusign/send-envelope", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          signerName,
-          signerEmail,
-          fileUrl,
-        }),
+        body: JSON.stringify({ signerEmail, signerName, fileUrl, proposalTitle }),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error("Server response is not valid JSON.");
+      }
+
       if (!res.ok) {
         throw new Error(data.error || "Failed to send document.");
       }
@@ -76,7 +80,11 @@ export default function FilePreview({
       </Button>
 
       {message && (
-        <p className={`text-sm mt-2 ${message.startsWith("✅") ? "text-green-600" : "text-red-600"}`}>
+        <p
+          className={`text-sm mt-2 ${
+            message.startsWith("✅") ? "text-green-600" : "text-red-600"
+          }`}
+        >
           {message}
         </p>
       )}
