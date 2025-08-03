@@ -22,6 +22,8 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
 
   useEffect(() => {
     const fetchProposal = async () => {
+
+        console.log("INFORMATION " + proposalId);
       const supabase = createClient();
       const { data, error } = await supabase
         .from("proposals")
@@ -69,14 +71,19 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
       updatedFileUrl = publicUrlData.publicUrl;
     }
 
+    const updateData: any = {
+      title,
+      notes,
+      status,
+    };
+
+    if (newFile && updatedFileUrl) {
+      updateData.file_url = updatedFileUrl;
+    }
+
     const { error } = await supabase
       .from("proposals")
-      .update({
-        title,
-        notes,
-        status,
-        file_url: updatedFileUrl,
-      })
+      .update(updateData)
       .eq("id", proposalId);
 
     setLoading(false);
@@ -85,13 +92,13 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
       console.error("Update error:", error);
       alert(`Update failed: ${error.message}`);
     } else {
-      router.push("/dashboard"); // Change this if needed
+      router.push("/dashboard");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
-      <br/>
+      <br />
       <h2 className="text-2xl font-semibold">Edit Proposal</h2>
 
       <Input
@@ -118,18 +125,16 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
 
       {fileUrl && (
         <div className="space-y-2">
-          <p className="text-sm text-gray-600">
-            <Button
+          <Button
             asChild
             variant="outline"
             className="text-black bg-white border border-gray-300 hover:bg-gray-100"
-            >
+          >
             <a href={`/view-file/${proposalId}`} rel="noopener noreferrer">
-                Send DocuSign
+              Send DocuSign
             </a>
-            </Button>
-          </p>
-          <br/>
+          </Button>
+          <br />
           <iframe
             src={fileUrl}
             className="w-full h-64 border rounded"
