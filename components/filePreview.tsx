@@ -24,7 +24,7 @@ export default function FilePreview({
     setMessage(null);
 
     try {
-      const res = await fetch("/api/send-docusign", {
+      const res = await fetch("/api/docusign/send-envelope", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
