@@ -23,8 +23,8 @@ export function Hero() {
         <br/>
         <br/>
         <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
+          href="/add-client"
+          // target="_blank"
           className="font-bold hover:underline"
           rel="noreferrer"
         >

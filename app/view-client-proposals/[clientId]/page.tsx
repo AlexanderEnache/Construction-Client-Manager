@@ -1,5 +1,7 @@
 import { ProposalListAll } from "@/components/dashboard/proposalListAll";
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface PageProps {
   params: {
@@ -33,9 +35,15 @@ export default async function Page({ params }: PageProps) {
   return (
     <div className="flex min-h-svh w-full justify-center p-6 md:p-10">
       <div className="w-full max-w-3xl">
-        <h1 className="text-xl font-semibold mb-4">
-          Proposals for Client: {client.name}
-        </h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-xl font-semibold">
+            Proposals for {client.name}
+          </h1>
+          <Link href={`/add-proposal/${params.clientId}`}>
+            <Button size="sm">Add Proposal</Button>
+          </Link>
+        </div>
+        <br/>
         <ProposalListAll proposals={proposals ?? []} />
       </div>
     </div>

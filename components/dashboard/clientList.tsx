@@ -46,14 +46,14 @@ export function ClientList({ clients, className }: ClientListProps) {
 
             {/* Right side: Proposal count + buttons */}
             <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">
+              {/* <span className="text-sm text-muted-foreground whitespace-nowrap">
                 {client.proposals?.count ?? 0} proposal{(client.proposals?.count ?? 0) === 1 ? "" : "s"}
-              </span>
+              </span> */}
 
               {/* View Button */}
               <Link href={`/view-client-proposals/${client.id}`}>
                 <Button variant="outline" size="sm">
-                  View Proposals
+                  View
                 </Button>
               </Link>
 

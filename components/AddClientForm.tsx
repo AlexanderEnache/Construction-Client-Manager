@@ -42,7 +42,7 @@ export function AddClientForm() {
     if (error) {
       alert(`Failed to add client: ${error.message}`);
     } else {
-      router.push("/dashboard"); // or wherever your client list is
+      router.push("/view-clients"); // or wherever your client list is
     }
   };
 

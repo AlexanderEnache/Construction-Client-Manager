@@ -7,7 +7,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const navItems = [
-    { name: "Dashboard", href: "/dashboard" },
+    { name: "All Proposals", href: "/dashboard" },
     { name: "Clients", href: "/view-clients" },
     { name: "Logout", href: "/logout" },
   ];
