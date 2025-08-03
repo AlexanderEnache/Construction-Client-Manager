@@ -1,4 +1,4 @@
-import { ProposalList } from "@/components/dashboard/proposalList";
+import { ProposalListAll } from "@/components/dashboard/proposalListAll";
 import { createClient } from "@/lib/supabase/server";
 
 interface PageProps {
@@ -36,7 +36,7 @@ export default async function Page({ params }: PageProps) {
         <h1 className="text-xl font-semibold mb-4">
           Proposals for Client: {client.name}
         </h1>
-        <ProposalList proposals={proposals ?? []} />
+        <ProposalListAll proposals={proposals ?? []} />
       </div>
     </div>
   );

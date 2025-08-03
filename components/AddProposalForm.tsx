@@ -17,8 +17,21 @@ export function AddProposalForm({ clientId, clientName }: AddProposalFormProps) 
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState("pending");
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
+    setFile(selectedFile);
+
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +39,6 @@ export function AddProposalForm({ clientId, clientName }: AddProposalFormProps) 
 
     const supabase = createClient();
 
-    // 🔑 Get current user
     const {
       data: { user },
       error: userError,
@@ -38,19 +50,15 @@ export function AddProposalForm({ clientId, clientName }: AddProposalFormProps) 
       return;
     }
 
-    console.log("USERID " + user.id);
-
     let uploadedFileUrl: string | null = null;
 
     if (file) {
       const filePath = `proposals/${Date.now()}-${file.name}`;
-
       const { error: uploadError } = await supabase.storage
         .from("proposal-files")
         .upload(filePath, file);
 
       if (uploadError) {
-        console.error("Upload error:", uploadError);
         alert(`File upload failed: ${uploadError.message}`);
         setLoading(false);
         return;
@@ -63,34 +71,32 @@ export function AddProposalForm({ clientId, clientName }: AddProposalFormProps) 
       uploadedFileUrl = publicUrlData.publicUrl;
     }
 
-    console.log("User ID", user.id);
-    console.log("Inserting proposal with:", {
-      title,
-      notes,
-      status,
-      file_url: uploadedFileUrl || null,
-      client_id: clientId,
-      user_id: user.id,
-    });
-
-    // ✅ Insert with user_id
-    const { error } = await supabase.from("proposals").insert([
-      {
-        title,
-        notes,
-        status,
-        file_url: uploadedFileUrl || null,
-        client_id: clientId,
-        user_id: user.id, // 👈 Explicitly passing user_id
-      },
-    ]);
+    const { data, error } = await supabase
+      .from("proposals")
+      .insert([
+        {
+          title,
+          notes,
+          status,
+          file_url: uploadedFileUrl,
+          client_id: clientId,
+          user_id: user.id,
+        },
+      ])
+      .select()
+      .single(); // This ensures you get a single object instead of an array
 
     setLoading(false);
 
-    if (error) {
-      alert(`Failed to add proposal: ${error.message}`);
+    if (error || !data) {
+      alert(`Failed to add proposal: ${error?.message || "Unknown error"}`);
     } else {
-      router.push(`/clients/${clientId}/view-proposals`);
+      const proposalId = data.id;
+      if (file) {
+        router.push(`/view-file/${proposalId}`);
+      } else {
+        router.push(`/view-client-proposals/${clientId}`);
+      }
     }
   }
 
@@ -115,21 +121,35 @@ export function AddProposalForm({ clientId, clientName }: AddProposalFormProps) 
         required
       />
 
-      <Input
-        type="text"
-        placeholder="Status (e.g., pending, approved)"
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-      />
-
       <div>
         <label className="text-sm font-medium block mb-1">Upload File (optional)</label>
         <Input
           type="file"
           accept="application/pdf,image/*"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          onChange={handleFileChange}
         />
       </div>
+
+      {previewUrl && (
+        <div className="mt-4">
+          <p className="text-sm mb-2 text-muted-foreground">Preview:</p>
+          {file?.type.startsWith("image/") ? (
+            <img
+              src={previewUrl}
+              alt="Preview"
+              className="max-h-64 border rounded object-contain"
+            />
+          ) : file?.type === "application/pdf" ? (
+            <iframe
+              src={previewUrl}
+              className="w-full h-64 border rounded"
+              title="PDF Preview"
+            ></iframe>
+          ) : (
+            <p className="text-red-500 text-sm">Preview not available for this file type.</p>
+          )}
+        </div>
+      )}
 
       <Button type="submit" disabled={loading}>
         {loading ? "Adding..." : "Add Proposal"}

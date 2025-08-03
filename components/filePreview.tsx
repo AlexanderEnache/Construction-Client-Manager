@@ -57,6 +57,18 @@ export default function FilePreview({
 
   return (
     <div className="space-y-6">
+      <Button onClick={handleSendDocuSign} disabled={sending}>
+      {sending ? "Sending..." : "Send via DocuSign"}
+      </Button>
+      {message && (
+        <p
+          className={`text-sm mt-2 ${
+            message.startsWith("✅") ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {message}
+        </p>
+      )}
       <div className="border rounded p-4">
         {fileUrl.endsWith(".pdf") ? (
           <iframe
@@ -74,20 +86,6 @@ export default function FilePreview({
           />
         )}
       </div>
-
-      <Button onClick={handleSendDocuSign} disabled={sending}>
-        {sending ? "Sending..." : "Send via DocuSign"}
-      </Button>
-
-      {message && (
-        <p
-          className={`text-sm mt-2 ${
-            message.startsWith("✅") ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {message}
-        </p>
-      )}
     </div>
   );
 }

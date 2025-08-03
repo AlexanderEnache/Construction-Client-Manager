@@ -11,6 +11,11 @@ interface Proposal {
   status: string;
   file_url: string;
   created_at: string;
+  client_id: string;      // <-- Add this
+  client: {
+    id: string,
+    name: string
+  }
 }
 
 interface ProposalListProps {
@@ -28,47 +33,59 @@ export function ProposalList({ proposals, className }: ProposalListProps) {
   }
 
   return (
-  <div className={cn("flex flex-col", className)}>
-    {proposals.map((proposal, index) => (
-      <Card
-        key={proposal.id}
-        className={cn(
-          "border-b border-border px-4 py-2 rounded-none",
-          index === proposals.length - 1 && "border-b-0" // remove border for last one if needed
-        )}
-      >
-        <div className="flex flex-row items-center gap-4 w-full overflow-hidden">
-          {/* Title */}
-          <div className="w-1/4 truncate whitespace-nowrap text-sm font-medium">
-            {proposal.title}
-          </div>
+    <div className={cn("flex flex-col", className)}>
+      {proposals.map((proposal, index) => (
+        <Card
+          key={proposal.id}
+          className={cn(
+            "border-b border-border px-4 py-2 rounded-none",
+            index === proposals.length - 1 && "border-b-0"
+          )}
+        >
+          <div className="flex flex-row items-center gap-4 w-full overflow-hidden">
+            {/* Title */}
+            <div className="w-1/5 truncate whitespace-nowrap text-sm font-medium">
+              {proposal.title}
+            </div>
 
-          {/* Notes */}
-          <div className="w-1/2 truncate whitespace-nowrap text-sm text-muted-foreground">
-            {proposal.notes}
-          </div>
+            {/* Notes */}
+            <div className="w-2/5 truncate whitespace-nowrap text-sm text-muted-foreground">
+              {proposal.notes}
+            </div>
 
-          {/* Status */}
-          <div className="ml-auto flex items-center gap-10">
-            <Badge variant="outline" className="capitalize text-sm">
-              {proposal.status}
-            </Badge>
-
-          {/* File URL */}
-            {proposal.file_url && (
-              <a
-                href={`/view-file/${proposal.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-xs whitespace-nowrap"
-              >
-                View File
+            {/* Client Name */}
+            <div className="w-1/5 truncate whitespace-nowrap text-sm text-blue-600 hover:underline">
+              <a href={`/clients/${proposal.client_id}`}>
+                {proposal.client.name}
               </a>
-            )}
+            </div>
+
+            {/* Status + View */}
+            <div className="ml-auto flex items-center gap-6">
+              <Badge variant="outline" className="capitalize text-sm">
+                {proposal.status}
+              </Badge>
+
+              <div className="w-24 text-xs whitespace-nowrap">
+                {proposal.file_url ? (
+                  <a
+                    href={`/view-file/${proposal.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline block text-center"
+                  >
+                    View File
+                  </a>
+                ) : (
+                  <span className="text-gray-500 italic block text-center">
+                    No file
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </Card>
-    ))}
-  </div>
-);
+        </Card>
+      ))}
+    </div>
+  );
 }

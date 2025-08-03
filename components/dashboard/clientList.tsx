@@ -53,7 +53,7 @@ export function ClientList({ clients, className }: ClientListProps) {
               {/* View Button */}
               <Link href={`/view-client-proposals/${client.id}`}>
                 <Button variant="outline" size="sm">
-                  View
+                  View Proposals
                 </Button>
               </Link>
 
