@@ -15,7 +15,7 @@ interface AddProposalFormProps {
 export function AddProposalForm({ clientId, clientName }: AddProposalFormProps) {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
-  const [status, setStatus] = useState("pending");
+  const [status, setStatus] = useState("No File");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -69,6 +69,7 @@ export function AddProposalForm({ clientId, clientName }: AddProposalFormProps) 
         .getPublicUrl(filePath);
 
       uploadedFileUrl = publicUrlData.publicUrl;
+      setStatus("Drafted");
     }
 
     const { data, error } = await supabase
