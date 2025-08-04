@@ -17,9 +17,14 @@ export async function POST(req: NextRequest) {
     const { sendEnvelope } = await import("../../../../scripts/docusign/sendEnvelope.js");
 
     // Pass parameters to sendEnvelope (adjust order if needed)
-    await sendEnvelope(signerName, signerEmail, fileUrl, proposalTitle);
+    // await sendEnvelope(signerName, signerEmail, fileUrl, proposalTitle);
 
-    return NextResponse.json({ success: true });
+    const result = await sendEnvelope(signerName, signerEmail, fileUrl, proposalTitle);
+
+    // Log the envelopeId from the result
+    console.log("Envelope ID HERE:", result.envelopeId);
+
+    return NextResponse.json({ success: true, envelopeId: result.envelopeId });
   } catch (error) {
     console.error("❌ DocuSign Error:", error);
     return NextResponse.json({ error: "Failed to send envelope" }, { status: 500 });

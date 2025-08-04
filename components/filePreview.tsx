@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
 
 interface FileViewerWrapperProps {
   proposalId: string;
@@ -20,6 +21,7 @@ export default function FilePreview({
 }: FileViewerWrapperProps) {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const supabase = createClient();
 
   async function handleSendDocuSign() {
     setSending(true);
@@ -35,6 +37,7 @@ export default function FilePreview({
       let data;
       try {
         data = await res.json();
+        // console.log("INFORMATION HERE " + data.documentStatus);
       } catch (jsonErr) {
         throw new Error("Server response is not valid JSON.");
       }
@@ -44,12 +47,28 @@ export default function FilePreview({
       }
 
       setMessage("✅ Document sent via DocuSign successfully!");
-    } catch (error: any) {
-      setMessage(`❌ Failed to send document: ${error.message}`);
-    } finally {
-      setSending(false);
+
+
+      // === Supabase update of proposal status ===
+      const { error: updateError } = await supabase
+        .from("proposals")
+        .update({
+          docusign_id: data.envelopeId,
+          status: "Sent",
+        })
+        .eq("id", proposalId);
+
+      if (updateError) {
+        throw new Error(updateError.message);
+      }
+
+
+      } catch (error: any) {
+        setMessage(`❌ Failed to send document: ${error.message}`);
+      } finally {
+        setSending(false);
+      }
     }
-  }
 
   if (!fileUrl) {
     return <p>No file available to preview.</p>;
