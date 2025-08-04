@@ -1,5 +1,6 @@
 import { ProposalList } from "@/components/dashboard/proposalList";
 import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default async function Page() {
   const supabase = await createClient();
@@ -27,7 +28,11 @@ export default async function Page() {
   const clientIds = clients?.map((c) => c.id) ?? [];
 
   if (clientIds.length === 0) {
-    return <div>No proposals (no clients assigned)</div>;
+    return (
+      <Card className="rounded-xl border bg-card shadow p-6 text-center text-muted-foreground">
+          <p>No proposals (no clients assigned)</p>
+      </Card>
+    );
   }
 
   // Fetch proposals filtered by client IDs

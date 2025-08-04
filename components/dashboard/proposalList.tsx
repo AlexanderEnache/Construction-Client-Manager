@@ -67,7 +67,10 @@ export function ProposalList({ proposals, className }: ProposalListProps) {
 
             {/* Status + View */}
             <div className="ml-auto flex items-center gap-6">
-              <Badge variant="outline" className="capitalize text-sm">
+              <Badge
+                  variant="outline"
+                  className="capitalize text-sm min-w-[80px] text-center justify-center"
+                >
                 {proposal.status}
               </Badge>
 

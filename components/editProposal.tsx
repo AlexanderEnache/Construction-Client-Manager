@@ -157,6 +157,13 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
         required
       />
 
+      <Button
+      type="submit"
+      disabled={loading || !isFormChanged()}
+      >
+        {loading ? "Updating..." : "Update Proposal"}
+      </Button>
+
       {(previewUrl || fileUrl) && (
         <div className="space-y-2">
           <div className="flex items-center">
@@ -180,13 +187,6 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
             </Button>
 
             <div className="flex-grow" /> {/* Pushes the Update button to the right */}
-
-            <Button
-              type="submit"
-              disabled={loading || !isFormChanged()}
-            >
-              {loading ? "Updating..." : "Update Proposal"}
-            </Button>
           </div>
 
           <br />

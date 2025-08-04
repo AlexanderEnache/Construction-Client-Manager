@@ -1,9 +1,9 @@
 import { EditProposalForm } from "@/components/editProposal";
 
-interface Props {
-  params: { id: string };
-}
+type Params = Promise<{ id: string }>
 
-export default function Page({ params }: Props) {
-  return <EditProposalForm proposalId={params.id} />;
+export default async function Page(props: { params: Params }) {
+  const params = await props.params;
+  const id = params.id;
+  return <EditProposalForm proposalId={id} />;
 }

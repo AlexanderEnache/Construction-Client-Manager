@@ -3,19 +3,18 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-interface PageProps {
-  params: {
-    clientId: string;
-  };
-}
+type Params = Promise<{ clientId: string }>
 
-export default async function Page({ params }: PageProps) {
+export default async function Page(props: { params: Params }) {
+  const params = await props.params;
+  const clientId = params.clientId;
+
   const supabase = await createClient();
 
   const { data: client, error: clientError } = await supabase
     .from("clients")
     .select("name")
-    .eq("id", params.clientId)
+    .eq("id", clientId)
     .single();
 
   if (clientError) {
@@ -25,7 +24,7 @@ export default async function Page({ params }: PageProps) {
   const { data: proposals, error: proposalsError } = await supabase
     .from("proposals")
     .select("*")
-    .eq("client_id", params.clientId)
+    .eq("client_id", clientId)
     .order("created_at", { ascending: false });
 
   if (proposalsError) {
@@ -39,7 +38,7 @@ export default async function Page({ params }: PageProps) {
           <h1 className="text-3xl font-semibold">
             Proposals for {client.name}
           </h1>
-          <Link href={`/add-proposal/${params.clientId}`}>
+          <Link href={`/add-proposal/${clientId}`}>
             <Button size="sm">Add Proposal</Button>
           </Link>
         </div>

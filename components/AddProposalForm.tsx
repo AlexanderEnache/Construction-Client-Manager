@@ -103,10 +103,6 @@ export function AddProposalForm({ clientId, clientName }: AddProposalFormProps) 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
-      <h2 className="text-2xl font-semibold">
-        Add Proposal for: <span className="text-blue-600">{clientName}</span>
-      </h2>
-
       <Input
         type="text"
         placeholder="Title"
