@@ -29,6 +29,8 @@ export function ClientList({ clients, className }: ClientListProps) {
 
   return (
     <div className={cn("flex flex-col", className)}>
+      <h1 className="text-3xl font-semibold">My Clients</h1>
+      <br/>
       {clients.map((client, index) => (
         <Card
           key={client.id}

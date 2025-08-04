@@ -17,13 +17,23 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
   const [status, setStatus] = useState("");
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [newFile, setNewFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [newFileType, setNewFileType] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isFileChanged, setIsFileChanged] = useState(false);
+
+  // Store original data for comparison
+  const [originalData, setOriginalData] = useState<{
+    title: string;
+    notes: string;
+    status: string;
+    fileUrl: string | null;
+  } | null>(null);
+
   const router = useRouter();
 
   useEffect(() => {
     const fetchProposal = async () => {
-
-        console.log("INFORMATION " + proposalId);
       const supabase = createClient();
       const { data, error } = await supabase
         .from("proposals")
@@ -40,13 +50,44 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
       setNotes(data.notes || "");
       setStatus(data.status || "");
       setFileUrl(data.file_url || null);
+      setPreviewUrl(null);
+      setNewFile(null);
+      setNewFileType(null);
+      setIsFileChanged(false);
+
+      setOriginalData({
+        title: data.title || "",
+        notes: data.notes || "",
+        status: data.status || "",
+        fileUrl: data.file_url || null,
+      });
     };
 
     fetchProposal();
   }, [proposalId]);
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  // Helper to check if form data changed
+  const isFormChanged = () => {
+    if (!originalData) return false;
+    if (title !== originalData.title) return true;
+    if (notes !== originalData.notes) return true;
+    if (status !== originalData.status) return true;
+    if (isFileChanged) return true; // New file uploaded
+    return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormChanged()) return; // Prevent submit if no changes
+
     setLoading(true);
 
     const supabase = createClient();
@@ -92,7 +133,7 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
       console.error("Update error:", error);
       alert(`Update failed: ${error.message}`);
     } else {
-      router.push("/dashboard");
+      router.push("/view-clients");
     }
   };
 
@@ -116,42 +157,89 @@ export function EditProposalForm({ proposalId }: EditProposalFormProps) {
         required
       />
 
-      <Input
-        type="text"
-        placeholder="Status (e.g., pending, approved)"
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-      />
-
-      {fileUrl && (
+      {(previewUrl || fileUrl) && (
         <div className="space-y-2">
-          <Button
-            asChild
-            variant="outline"
-            className="text-black bg-white border border-gray-300 hover:bg-gray-100"
-          >
-            <a href={`/view-file/${proposalId}`} rel="noopener noreferrer">
-              Send DocuSign
-            </a>
-          </Button>
+          <div className="flex items-center">
+            <Button
+              asChild
+              variant="outline"
+              className="text-black bg-white border border-gray-300 hover:bg-gray-100"
+              disabled={status === "Sent" && !isFileChanged}
+            >
+              <a
+                href={`/view-file/${proposalId}`}
+                rel="noopener noreferrer"
+                style={{
+                  pointerEvents:
+                    status === "Sent" && !isFileChanged ? "none" : undefined,
+                  opacity: status === "Sent" && !isFileChanged ? 0.6 : 1,
+                }}
+              >
+                {status === "Sent" && !isFileChanged ? "Sent" : "Send DocuSign"}
+              </a>
+            </Button>
+
+            <div className="flex-grow" /> {/* Pushes the Update button to the right */}
+
+            <Button
+              type="submit"
+              disabled={loading || !isFormChanged()}
+            >
+              {loading ? "Updating..." : "Update Proposal"}
+            </Button>
+          </div>
+
           <br />
-          <iframe
-            src={fileUrl}
-            className="w-full h-64 border rounded"
-            title="File Preview"
-          />
+
+          {newFile ? (
+            newFileType === "application/pdf" ? (
+              <iframe
+                src={previewUrl || ""}
+                className="w-full h-64 border rounded"
+                title="File Preview"
+              />
+            ) : (
+              <img
+                src={previewUrl || ""}
+                alt="File Preview"
+                className="max-w-full max-h-64 rounded border"
+              />
+            )
+          ) : fileUrl?.endsWith(".pdf") ? (
+            <iframe
+              src={fileUrl}
+              className="w-full h-64 border rounded"
+              title="File Preview"
+            />
+          ) : (
+            <img
+              src={fileUrl || ""}
+              alt="File Preview"
+              className="max-w-full max-h-64 rounded border"
+            />
+          )}
         </div>
       )}
 
       <Input
         type="file"
         accept="application/pdf,image/*"
-        onChange={(e) => setNewFile(e.target.files?.[0] || null)}
-      />
+        onChange={(e) => {
+          const file = e.target.files?.[0] || null;
+          setNewFile(file);
 
-      <Button type="submit" disabled={loading}>
-        {loading ? "Updating..." : "Update Proposal"}
-      </Button>
+          if (file) {
+            setNewFileType(file.type);
+            const objectUrl = URL.createObjectURL(file);
+            setPreviewUrl(objectUrl);
+            setIsFileChanged(true);
+          } else {
+            setPreviewUrl(null);
+            setNewFileType(null);
+            setIsFileChanged(false);
+          }
+        }}
+      />
     </form>
   );
 }

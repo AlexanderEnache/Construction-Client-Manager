@@ -3,6 +3,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Button } from "@/components/ui/button"; // ✅ Make sure this is imported
+
 
 interface Proposal {
   id: string;
@@ -34,6 +37,8 @@ export function ProposalList({ proposals, className }: ProposalListProps) {
 
   return (
     <div className={cn("flex flex-col", className)}>
+      <h1 className="text-3xl font-semibold">All Proposals</h1>
+      <br/>
       {proposals.map((proposal, index) => (
         <Card
           key={proposal.id}
@@ -55,7 +60,7 @@ export function ProposalList({ proposals, className }: ProposalListProps) {
 
             {/* Client Name */}
             <div className="w-1/5 truncate whitespace-nowrap text-sm text-blue-600 hover:underline">
-              <a href={`/clients/${proposal.client_id}`}>
+              <a href={`/view-client-proposals/${proposal.client_id}`}>
                 {proposal.client.name}
               </a>
             </div>
@@ -67,20 +72,16 @@ export function ProposalList({ proposals, className }: ProposalListProps) {
               </Badge>
 
               <div className="w-24 text-xs whitespace-nowrap">
-                {proposal.file_url ? (
-                  <a
-                    href={`/view-file/${proposal.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline block text-center"
+                {/* ✅ Edit Button */}
+                <Link href={`/edit-proposals/${proposal.id}`}>
+                  <Button
+                  size="sm"
+                  variant="outline"
+                  className="bg-white text-black border border-gray-300 hover:bg-gray-100"
                   >
-                    View File
-                  </a>
-                ) : (
-                  <span className="text-gray-500 italic block text-center">
-                    No file
-                  </span>
-                )}
+                    View
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

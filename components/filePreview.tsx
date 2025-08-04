@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 interface FileViewerWrapperProps {
   proposalId: string;
@@ -76,9 +77,15 @@ export default function FilePreview({
 
   return (
     <div className="space-y-6">
+    <div className="flex justify-between">
       <Button onClick={handleSendDocuSign} disabled={sending}>
-      {sending ? "Sending..." : "Send via DocuSign"}
+        {sending ? "Sending..." : "Send via DocuSign"}
       </Button>
+
+      <Link href={`/view-clients/`}>
+        <Button variant="secondary">Back</Button>
+      </Link>
+    </div>
       {message && (
         <p
           className={`text-sm mt-2 ${

@@ -18,7 +18,7 @@ interface ProposalListProps {
   className?: string;
 }
 
-export function ProposalListAll({ proposals, className }: ProposalListProps) {
+export function ProposalListClient({ proposals, className }: ProposalListProps) {
   if (!proposals || proposals.length === 0) {
     return (
       <Card className={cn("p-6 text-center text-muted-foreground", className)}>
@@ -50,6 +50,12 @@ export function ProposalListAll({ proposals, className }: ProposalListProps) {
 
             {/* Right Section: Edit + Status + File */}
             <div className="ml-auto flex items-center gap-6">
+
+              {/* Status */}
+              <Badge variant="outline" className="capitalize text-sm">
+                {proposal.status}
+              </Badge>
+              
               {/* ✅ Edit Button */}
               <Link href={`/edit-proposals/${proposal.id}`}>
                 <Button
@@ -57,17 +63,12 @@ export function ProposalListAll({ proposals, className }: ProposalListProps) {
                   variant="outline"
                   className="bg-white text-black border border-gray-300 hover:bg-gray-100"
                 >
-                  Edit
+                  View
                 </Button>
               </Link>
 
-              {/* Status */}
-              <Badge variant="outline" className="capitalize text-sm">
-                {proposal.status}
-              </Badge>
-
               {/* File URL */}
-              <div className="w-28">
+              {/* <div className="w-28">
                 {proposal.file_url ? (
                   <a
                     href={`/view-file/${proposal.id}/`}
@@ -82,7 +83,7 @@ export function ProposalListAll({ proposals, className }: ProposalListProps) {
                     No file
                   </span>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </Card>
